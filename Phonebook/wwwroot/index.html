@@ -2,11 +2,11 @@
 <html lang="en" ng-app="phonebookApp">
 <head>
     <meta charset="utf-8">
-    <title>{{title}}</title>
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css" />
     <script src="lib/angular/angular.js"></script>
     <script src="js/controllers.js"></script>
-    <style>
+    <title>Телефонный справочник</title>
+    <!--<style>
         td {
             padding-right: 5px;
         }
@@ -14,47 +14,60 @@
         th {
             padding-right: 10px;
         }
-    </style>
+    </style>-->
 </head>
 <body ng-controller="PhonebookListController">
 
-    <div class="container">
-        <h1>{{title2}}</h1>
-        <input type="text" ng-model="query">
-        <table>
-            <thead>
-                <tr>
-                    <th>
-                        <a href="" ng-click="sort('name')">
-                            Name
-                            <i class="glyphicon" ng-class="{
+    <!--<div class="container">
+        <div class="col-sm-5">
+            <h2>{{title}}</h2>
+            <input type="text" ng-model="query">
+            <table style="width:100%" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Sr.</th>
+                        <th>
+                            <a href="" ng-click="sort('name')">
+                                Name
+                                <i class="glyphicon" ng-class="{
                                'glyphicon-chevron-up' : isSortUp('name'),
                                'glyphicon-chevron-down' : isSortDown('name')}">
-                            </i>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="" ng-click="sort('phoneNumber')">
-                            Number
-                            <i class="glyphicon" ng-class="{
+                                </i>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('phoneNumber')">
+                                Number
+                                <i class="glyphicon" ng-class="{
                                'glyphicon-chevron-up' : isSortUp('phoneNumber'),
                                'glyphicon-chevron-down' : isSortDown('phoneNumber')}">
-                            </i>
-                        </a>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="subscriber in subscriberFun = (subscriberList | filter:query | orderBy:sortField:reverse)">
-                    <td>{{subscriber.name}}</td>
-                    <td>{{subscriber.phoneNumber}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <p>Количество найденных абонентов: {{subscriberFun.length}}</p>
+                                </i>
+                            </a>
+                        </th>
+                        <th>Option</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="subscriber in subscriberFun = (subscriberList | filter:query | orderBy:sortField:reverse)">
+                        <th>{{$index+1}}</th>
+                        <td>{{subscriber.name}}</td>
+                        <td>{{subscriber.phoneNumber}}</td>
+                        <td>
+                            <a href="#" ng-click="getSubscriber(item)" title="Details Record" class="btn btn-primary btn-xs pull-left">
+                                Details
+                            </a>
+                            <a href="#" ng-click="deleteSubscriber(item)" title="Delete Record" class="btn btn-danger btn-xs pull-left">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Количество найденных абонентов: {{subscriberFun.length}}</p>
+        </div>
     </div>
     <hr />
-    <hr />
+    <hr />-->
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-4">
@@ -85,8 +98,9 @@
                 </form>
                 <span class="warning">{{msg}}</span>
             </div>
-            <div class="col-sm-8">
-                <h3>All Subscribers</h3>
+            <div class="col-sm-5">
+                <h3>{{title}}</h3>
+                <input type="text" ng-model="query">
                 <table style="width:100%" class="table table-striped">
                     <thead>
                         <tr>
@@ -113,15 +127,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in subscriberList">
+                        <tr ng-repeat="item in subscriberFun = (subscriberList | filter:query | orderBy:sortField:reverse)">
                             <td>{{ $index+1 }}</td>
                             <td>{{ item.name }}</td>
                             <td>{{ item.phoneNumber }}</td>
                             <td>
-                                <a href="#" ng-click="getSubscriber(item)" title="Edit Record" class="btn btn-primary btn-xs pull-right">
-                                    Edit
+                                <a href="#" ng-click="getSubscriber(item)" title="Details Record" class="btn btn-primary btn-xs pull-left">
+                                    Details
                                 </a>
-                                <a href="#" ng-click="deleteSubscriber(item)" title="Delete Record" class="btn btn-danger btn-xs pull-right">
+                                <a href="#" ng-click="deleteSubscriber(item)" title="Delete Record" class="btn btn-danger btn-xs pull-left">
                                     Delete
                                 </a>
                             </td>

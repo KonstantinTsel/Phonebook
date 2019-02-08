@@ -9,7 +9,7 @@ using Phonebook.Models;
 
 namespace Phonebook.Controllers
 {
-    [Route("api/[controller]")]//, Produces("application/json")]
+    [Route("api/[controller]"), Produces("application/json")]
     [ApiController]
     public class SubscribersController : Controller
     {

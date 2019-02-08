@@ -3,8 +3,7 @@
 /* Controllers */
 var phonebookApp = angular.module('phonebookApp',[]);
 phonebookApp.controller('PhonebookListController', ['$scope', '$http', function($scope, $http) {
-    $scope.title = "Телефонный справочник";
-    $scope.title2 = "Абоненты";
+    $scope.title = "Абоненты";
     $scope.subscriberList = null;
     $scope.subscriberModel = {};
     $scope.subscriberModel.id = 0;
@@ -18,7 +17,7 @@ phonebookApp.controller('PhonebookListController', ['$scope', '$http', function(
         }).then(function (response) {
             $scope.subscriberList = response.data;
         }, function (error) {
-            console.log(error);
+            console.log(error, 'can not get data.');
         });
     };
 
@@ -26,11 +25,11 @@ phonebookApp.controller('PhonebookListController', ['$scope', '$http', function(
     $scope.getSubscriber = function (subscriber) {
         $http({
             method: 'GET',
-            url: 'api/subscriber/' + parseInt(subscriber.id)
+            url: 'api/subscribers/' + parseInt(subscriber.id)
         }).then(function (response) {
             $scope.subscriberModel = response.data;
         }, function (error) {
-            console.log(error);
+            console.log(error, 'can not get data.');
         });
     };
 
@@ -38,7 +37,7 @@ phonebookApp.controller('PhonebookListController', ['$scope', '$http', function(
     $scope.saveSubscriber = function () {
         $http({
             method: 'POST',
-            url: '/api/subscriber/',
+            url: '/api/subscribers/',
             data: $scope.subscriberModel
         }).then(function (response) {
             $scope.reset();
@@ -52,7 +51,7 @@ phonebookApp.controller('PhonebookListController', ['$scope', '$http', function(
     $scope.updateSubscriber = function () {
         $http({
             method: 'PUT',
-            url: '/api/subscriber/' + parseInt($scope.subscriberModel.id),
+            url: '/api/subscribers/' + parseInt($scope.subscriberModel.id),
             data: $scope.subscriberModel
         }).then(function (response) {
             $scope.reset();
@@ -68,7 +67,7 @@ phonebookApp.controller('PhonebookListController', ['$scope', '$http', function(
         if (IsConf) {
             $http({
                 method: 'DELETE',
-                url: '/api/subscriber/' + parseInt(subscriber.id)
+                url: '/api/subscribers/' + parseInt(subscriber.id)
             }).then(function (response) {
                 $scope.reset();
                 getallData();
@@ -81,8 +80,8 @@ phonebookApp.controller('PhonebookListController', ['$scope', '$http', function(
     //******=========Clear Form=========******
     $scope.reset = function () {
         var msg = "Form Cleared";
-        $scope.userModel = {};
-        $scope.userModel.id = 0;
+        $scope.subscriberModel = {};
+        $scope.subscriberModel.id = 0;
     };
 
 
