@@ -1,0 +1,61 @@
+﻿<!doctype html>
+<html lang="en" ng-app="phonecatApp">
+<head>
+    <meta charset="utf-8">
+    <title>Phonebook</title>
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css" />
+    <script src="lib/angular/angular.js"></script>
+    <script src="js/controllers.js"></script>
+    <style>
+        td {
+            padding-right: 5px;
+        }
+
+        th {
+            padding-right: 10px;
+        }
+    </style>
+</head>
+<body ng-controller="PhoneListController">
+
+    <div class="container">
+        <h1>{{title}}</h1>
+        <input type="text" ng-model="query">
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <a href="" ng-click="sort('name')">
+                            Name
+                            <i class="glyphicon" ng-class="{
+                'glyphicon-chevron-up' : isSortUp('name'),
+                'glyphicon-chevron-down' : isSortDown('name')}">
+                            </i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('phoneNumber')">
+                            Number
+                            <i class="glyphicon" ng-class="{
+                'glyphicon-chevron-up' : isSortUp('phoneNumber'),
+                'glyphicon-chevron-down' : isSortDown('phoneNumber')}">
+                            </i>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--<tr ng-repeat="phone in phoneFun = (phones | filter:query | orderBy:sortField:reverse)">
+                    <td>{{phone.name}}</td>
+                    <td>{{phone.number}}</td>
+                </tr>-->
+                <tr ng-repeat="phone in phoneFun = (phones | filter:query | orderBy:sortField:reverse)">
+                    <td>{{phone.name}}</td>
+                    <td>{{phone.phoneNumber}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Количество найденных абонентов: {{phoneFun.length}}</p>
+    </div>
+</body>
+</html>
