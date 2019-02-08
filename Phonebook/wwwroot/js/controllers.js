@@ -1,41 +1,105 @@
 'use strict';
 
 /* Controllers */
-var phonecatApp = angular.module('phonecatApp',[]);
-phonecatApp.controller('PhoneListController', ['$scope', '$http', function($scope, $http) {
-    $scope.title="Телефонный справочник";
-    //$scope.phones = [
-    //    {
-    //      name: 'Alex',
-    //      number: '89231234567'
-    //    }, 
-    //    {
-    //      name: 'Denis',
-    //      number: '89232471515'
-    //    }, 
-    //    {
-    //      name: 'Bob',
-    //      number: '89222222222'
-    //    }
-    //  ];
+var phonebookApp = angular.module('phonebookApp',[]);
+phonebookApp.controller('PhonebookListController', ['$scope', '$http', function($scope, $http) {
+    $scope.title = "Телефонный справочник";
+    $scope.title2 = "Абоненты";
+    $scope.subscriberList = null;
+    $scope.subscriberModel = {};
+    $scope.subscriberModel.id = 0;
+    getallData();
 
-    //$scope.phones2 = 
+    //******=========Get subscribers=========******
+    function getallData() {
+        $http({
+            method: 'GET',
+            url: 'api/subscribers'
+        }).then(function (response) {
+            $scope.subscriberList = response.data;
+        }, function (error) {
+            console.log(error);
+        });
+    };
 
-    $http({
-        method: 'GET',
-        url: 'api/subscribers'
-     }).then(function (response){
-        console.log('This is data:', response.data,'\nThis is status:', response.status, 
-            '\nThis is headers:', response.headers, '\nThis is config:', response.config);
-        $scope.phones = response.data;
-     },function (error){
-        console.log(error, 'can not get data.');
-     });
+    //******=========Get single subscriber=========******
+    $scope.getSubscriber = function (subscriber) {
+        $http({
+            method: 'GET',
+            url: 'api/subscriber/' + parseInt(subscriber.id)
+        }).then(function (response) {
+            $scope.subscriberModel = response.data;
+        }, function (error) {
+            console.log(error);
+        });
+    };
+
+    //******=========Save subscriber=========******
+    $scope.saveSubscriber = function () {
+        $http({
+            method: 'POST',
+            url: '/api/subscriber/',
+            data: $scope.subscriberModel
+        }).then(function (response) {
+            $scope.reset();
+            getallData();
+        }, function (error) {
+            console.log(error);
+        });
+    };
+
+    //******=========Update subscriber=========******
+    $scope.updateSubscriber = function () {
+        $http({
+            method: 'PUT',
+            url: '/api/subscriber/' + parseInt($scope.subscriberModel.id),
+            data: $scope.subscriberModel
+        }).then(function (response) {
+            $scope.reset();
+            getallData();
+        }, function (error) {
+            console.log(error);
+        });
+    };
+
+    //******=========Delete subscriber=========******
+    $scope.deleteSubscriber = function (subscriber) {
+        var IsConf = confirm('You are about to delete ' + subscriber.name + '. Are you sure?');
+        if (IsConf) {
+            $http({
+                method: 'DELETE',
+                url: '/api/subscriber/' + parseInt(subscriber.id)
+            }).then(function (response) {
+                $scope.reset();
+                getallData();
+            }, function (error) {
+                console.log(error);
+            });
+        }
+    };
+
+    //******=========Clear Form=========******
+    $scope.reset = function () {
+        var msg = "Form Cleared";
+        $scope.userModel = {};
+        $scope.userModel.id = 0;
+    };
+
+
+    //$http({
+    //    method: 'GET',
+    //    url: 'api/subscribers'
+    // }).then(function (response){
+    //    console.log('This is data:', response.data,'\nThis is status:', response.status, 
+    //        '\nThis is headers:', response.headers, '\nThis is config:', response.config);
+    //     $scope.subscribers = response.data;
+    // },function (error){
+    //    console.log(error, 'can not get data.');
+    // });
+
 
     /* Filters */
-    //var date = new Date();
-    //$scope.today = date;
-
+    
     $scope.sortField = undefined;
     $scope.reverse = false;
 
