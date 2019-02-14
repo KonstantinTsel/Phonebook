@@ -1,76 +1,61 @@
 ﻿<!doctype html>
-<html lang="en" ng-app="phonebookApp">
+<html ng-app="phonebookApp">
 <head>
     <meta charset="utf-8">
+    <!--Library scripts-->
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css" />
     <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular/ui-bootstrap-tpls.js"></script>
+    <script src="lib/angular/angular-animate.js"></script>
+    <script src="lib/angular/angular-sanitize.js"></script>
+    <!--App scripts-->
     <script src="js/controllers.js"></script>
+
     <title>Телефонный справочник</title>
-    <!--<style>
-        td {
-            padding-right: 5px;
-        }
-
-        th {
-            padding-right: 10px;
-        }
-    </style>-->
 </head>
-<body ng-controller="PhonebookListController">
+<body> <!--ng-controller="ModalCtrl as modctrl">-->
 
-    <!--<div class="container">
-        <div class="col-sm-5">
-            <h2>{{title}}</h2>
-            <input type="text" ng-model="query">
-            <table style="width:100%" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Sr.</th>
-                        <th>
-                            <a href="" ng-click="sort('name')">
-                                Name
-                                <i class="glyphicon" ng-class="{
-                               'glyphicon-chevron-up' : isSortUp('name'),
-                               'glyphicon-chevron-down' : isSortDown('name')}">
-                                </i>
-                            </a>
-                        </th>
-                        <th>
-                            <a href="" ng-click="sort('phoneNumber')">
-                                Number
-                                <i class="glyphicon" ng-class="{
-                               'glyphicon-chevron-up' : isSortUp('phoneNumber'),
-                               'glyphicon-chevron-down' : isSortDown('phoneNumber')}">
-                                </i>
-                            </a>
-                        </th>
-                        <th>Option</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="subscriber in subscriberFun = (subscriberList | filter:query | orderBy:sortField:reverse)">
-                        <th>{{$index+1}}</th>
-                        <td>{{subscriber.name}}</td>
-                        <td>{{subscriber.phoneNumber}}</td>
-                        <td>
-                            <a href="#" ng-click="getSubscriber(item)" title="Details Record" class="btn btn-primary btn-xs pull-left">
-                                Details
-                            </a>
-                            <a href="#" ng-click="deleteSubscriber(item)" title="Delete Record" class="btn btn-danger btn-xs pull-left">
-                                Delete
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>Количество найденных абонентов: {{subscriberFun.length}}</p>
+    <script type="text/ng-template" id="modal.html">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Добавление новой записи</h3>
         </div>
-    </div>
-    <hr />
-    <hr />-->
-    <div class="container-fluid">
+        <div class="modal-body" id="modal-body">
+            <form name="frmSubscriber" novalidate>
+                <input type="hidden" ng-model="mdlictrl.subscriber.id" name="uid" />
+                <div class="form-group">
+                    <label for="uname" class="control-label">Имя абонента</label>
+                    <input type="text" class="form-control" ng-model="mdlictrl.subscriber.name" name="uname" placeholder="" required />
+                    <span class="error" ng-show="(frmSubscriber.$dirty||submitted) && frmSubscriber.uname.$error.required">
+                        Необходимо указать имя абонента!
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label for="phone" class="control-label">Номер телефона абонента</label>
+                    <input type="number" class="form-control" ng-model="mdlictrl.subscriber.phoneNumber" name="phone" placeholder="" required />
+                    <span class="error" ng-show="(frmSubscriber.$dirty ||submitted) && frmSubscriber.phone.$error.required">
+                        Необходимо указать номер телефона абонента
+                    </span>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" type="button" ng-click="mdlictrl.reset()">Очистить</button>
+            <button class="btn btn-primary" type="button" ng-click="mdlictrl.ok()">Добавить</button>
+            <button class="btn btn-warning" type="button" ng-click="mdlictrl.cancel()">Отмена</button>
+        </div>
+    </script>
+
+    <div ng-controller="PhonebookListCtrl as plctrl" class="container-fluid">
         <div class="row">
-            <div class="col-sm-4">
+            <!--<button type="button" class="btn btn-default" ng-click="saveSubscriberAfterModal()">Тестовая модалка 1!</button>
+            <div ng-show="subscriberToSave.name">
+                Данные из модального окна:
+                <br>Имя: {{ subscriberToSave.name }}
+                <br>Номер: {{ subscriberToSave.phoneNumber }}
+                <br>Имя в subscriberModel: {{ subscriberModel.name }}
+                <br>Номер в subscriberModel: {{ subscriberModel.phoneNumber }}
+            </div>-->
+            <!--<div class="col-sm-4">
                 <h3>Add New Subscriber</h3>
                 <form name="frmSubscriber" novalidate>
                     <input type="hidden" ng-model="subscriberModel.id" name="uid" />
@@ -81,33 +66,33 @@
                     </div>
                     <div class="form-group">
                         <label for="phone" class="control-label">Subscriber's phone number</label>
-                        <input type="text" class="form-control" ng-model="subscriberModel.phoneNumber" name="phone" placeholder="" required />
+                        <input type="number" class="form-control" ng-model="subscriberModel.phoneNumber" name="phone" placeholder="" required />
                         <span class="error" ng-show="(frmSubscriber.$dirty ||submitted) && frmSubscriber.phone.$error.required">Phone number is Required!</span>
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-danger" ng-click="reset()">Reset</button>
-                        <button type="submit" class="btn btn-primary" ng-click="saveSubscriber()" ng-disabled="frmSubscriber.$invalid"
+                        <button type="button" class="btn btn-danger" ng-click="reset()">Reset</button>
+                        <button type="button" class="btn btn-primary" ng-click="saveSubscriber()" ng-disabled="frmSubscriber.$invalid"
                                 ng-If="subscriberModel.id == 0">
                             Create
                         </button>
-                        <button type="submit" class="btn btn-success" ng-click="updateSubscriber()" ng-disabled="frmSubscriber.$invalid"
+                        <button type="button" class="btn btn-success" ng-click="updateSubscriber()" ng-disabled="frmSubscriber.$invalid"
                                 ng-If="subscriberModel.id > 0">
                             Update
                         </button>
                     </div>
                 </form>
                 <span class="warning">{{msg}}</span>
-            </div>
+            </div>-->
             <div class="col-sm-5">
                 <h3>{{title}}</h3>
                 <input type="text" ng-model="query">
                 <table style="width:100%" class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Sr.</th>
+                            <th>#</th>
                             <th>
                                 <a href="" ng-click="sort('name')">
-                                    Name
+                                    Имя
                                     <i class="glyphicon" ng-class="{
                                        'glyphicon-chevron-up' : isSortUp('name'),
                                        'glyphicon-chevron-down' : isSortDown('name')}">
@@ -116,14 +101,14 @@
                             </th>
                             <th>
                                 <a href="" ng-click="sort('phoneNumber')">
-                                    Number
+                                    Номер
                                     <i class="glyphicon" ng-class="{
                                        'glyphicon-chevron-up' : isSortUp('phoneNumber'),
                                        'glyphicon-chevron-down' : isSortDown('phoneNumber')}">
                                     </i>
                                 </a>
                             </th>
-                            <th>Option</th>
+                            <th>Опции</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,17 +118,23 @@
                             <td>{{ item.phoneNumber }}</td>
                             <td>
                                 <a href="#" ng-click="getSubscriber(item)" title="Details Record" class="btn btn-primary btn-xs pull-left">
-                                    Details
+                                    Изменить
                                 </a>
                                 <a href="#" ng-click="deleteSubscriber(item)" title="Delete Record" class="btn btn-danger btn-xs pull-left">
-                                    Delete
+                                    Удалить
                                 </a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+                <p>Найдено абонентов: {{subscriberFun.length}}</p>
+                <!--<button type="button" class="btn btn-danger" ng-click="saveSubscriberViaModal()">Добавить новую запись</button>-->
+                <div ng-controller="ModalCtrl">
+                    <button type="button" class="btn btn-danger" ng-click="open()">Добавить новую запись</button>
+                </div>
             </div>
         </div>
+        <!--{{title2}}-->
     </div>
 </body>
 </html>

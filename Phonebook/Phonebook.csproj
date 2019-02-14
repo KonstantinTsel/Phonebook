@@ -7,8 +7,10 @@
   <ItemGroup>
     <PackageReference Include="Angular.UI.Bootstrap" Version="2.5.0" />
     <PackageReference Include="angularjs" Version="1.7.5" />
+    <PackageReference Include="AngularJS.Animate" Version="1.7.5" />
     <PackageReference Include="AngularJS.Core" Version="1.7.5" />
     <PackageReference Include="AngularJS.Route" Version="1.7.5" />
+    <PackageReference Include="AngularJS.Sanitize" Version="1.7.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
