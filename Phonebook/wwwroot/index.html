@@ -10,12 +10,6 @@
     <script src="lib/angular/angular-sanitize.js"></script>
     <!--App scripts-->
     <script src="js/controllers.js"></script>
-    <!--Style-->
-    <style>
-        .nav, .pagination, .carousel, .panel-title a {
-            cursor: pointer;
-        }
-    </style>
 
     <title>Телефонный справочник</title>
 </head>
@@ -45,7 +39,8 @@
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-danger" type="button" ng-click="mdlictrl.reset()">Восстановить</button>
+            <button class="btn btn-danger" type="button" ng-click="mdlictrl.reset()" ng-If="mdlictrl.subscriber.id > 0">Восстановить</button>
+            <button class="btn btn-danger" type="button" ng-click="mdlictrl.reset()" ng-If="mdlictrl.subscriber.id == 0">Очистить</button>
             <button class="btn btn-primary" type="button" ng-disabled="frmSubscriber.$invalid" ng-click="mdlictrl.ok()">Отправить</button>
             <button class="btn btn-warning" type="button" ng-click="mdlictrl.cancel()">Отмена</button>
         </div>
@@ -53,34 +48,6 @@
 
     <div ng-controller="PhonebookListCtrl" class="container-fluid">
         <div class="row">
-            <!--<div class="col-sm-4">
-        <h3>Add New Subscriber</h3>
-        <form name="frmSubscriber" novalidate>
-            <input type="hidden" ng-model="subscriberModel.id" name="uid" />
-            <div class="form-group">
-                <label for="uname" class="control-label">Subscriber's name</label>
-                <input type="text" class="form-control" ng-model="subscriberModel.name" name="uname" placeholder="" required />
-                <span class="error" ng-show="(frmSubscriber.$dirty||submitted) && frmSubscriber.uname.$error.required">Subscriber's name is Required</span>
-            </div>
-            <div class="form-group">
-                <label for="phone" class="control-label">Subscriber's phone number</label>
-                <input type="text" class="form-control" ng-model="subscriberModel.phoneNumber" name="phone" placeholder="" required />
-                <span class="error" ng-show="(frmSubscriber.$dirty ||submitted) && frmSubscriber.phone.$error.required">Phone number is Required!</span>
-            </div>
-            <div class="form-group">
-                <button type="button" class="btn btn-danger" ng-click="reset()">Reset</button>
-                <button type="button" class="btn btn-primary" ng-click="saveSubscriber()" ng-disabled="frmSubscriber.$invalid"
-                        ng-If="subscriberModel.id == 0">
-                    Create
-                </button>
-                <button type="button" class="btn btn-success" ng-click="updateSubscriber()" ng-disabled="frmSubscriber.$invalid"
-                        ng-If="subscriberModel.id > 0">
-                    Update
-                </button>
-            </div>
-        </form>
-        <span class="warning">{{msg}}</span>
-    </div>-->
             <div class="col-sm-6">
                 <h3>{{title}}</h3>
                 <input type="text" ng-model="query">
@@ -112,14 +79,10 @@
                     <tbody>
                         <tr ng-repeat="item in (subscriberFun = (subscriberList | filter:query | orderBy:sortField:reverse))
                             .slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
-                            <!--<tr ng-repeat="item in subscriberList | orderBy:sortField:reverse">-->
                             <td>{{ $index+1 }}</td>
                             <td>{{ item.name }}</td>
                             <td>{{ item.phoneNumber }}</td>
                             <td>
-                                <!--<a href="#" ng-click="getSubscriber(item)" title="Details Record" class="btn btn-primary btn-xs pull-left">
-                        Изменить
-                    </a>-->
                                 <a href="#" ng-controller="ModalCtrl" ng-click="update_open()" title="Изменение записи" class="btn btn-primary btn-xs pull-left">
                                     Изменить
                                 </a>
@@ -132,7 +95,6 @@
                 </table>
                 Отображать <select ng-model="viewby" ng-change="setItemsPerPage(viewby)"><option>3</option><option>5</option><option>10</option>
                 <option>20</option><option>30</option><option>40</option><option>50</option></select> записей на странице.
-                <!--<ul uib-pagination total-items="subscriberFun.length" ng-model="currentPage" items-per-page="itemsPerPage"></ul>-->
                 <ul uib-pagination total-items="subscriberFun.length" items-per-page="itemsPerPage" ng-model="currentPage" max-size="maxSize"
                                 class="pagination-sm" boundary-links="true" ng-change="pageChanged()"></ul>
                 <pre>Найдено абонентов: {{subscriberFun.length}}</pre>

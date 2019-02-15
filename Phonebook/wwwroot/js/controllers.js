@@ -9,13 +9,12 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$log', functio
     $scope.subscriberModel = {};
     $scope.subscriberModel.id = 0;
     getallData();
-    //$scope.setTitle("title in PhonebookListCtrl");
     
     $scope.setSubscriberList = function (subscriberList) {
         $scope.subscriberList = subscriberList;
     };
 
-    //Pagination
+    /* Pagination */
     {
         $scope.viewby = 10;
         $scope.itemsPerPage = $scope.viewby;
@@ -48,49 +47,6 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$log', functio
         });
     };
 
-    //******=========Get single subscriber=========******
-    $scope.getSubscriber = function (subscriber) {
-        $http({
-            method: 'GET',
-            url: 'api/subscribers/' + parseInt(subscriber.id)
-        }).then(function (response) {
-            $scope.subscriberModel = response.data;
-        }, function (error) {
-            console.log(error, 'can not get data.');
-        });
-    };
-
-    $scope.saveSubscriber = function () {
-        $http({
-            method: 'POST',
-            url: '/api/subscribers/',
-            data: $scope.subscriberModel
-        }).then(function (response) {
-            $scope.reset();
-            getallData();
-            console.log(response, '\nпосле getalldata()\nИмя: ', response.data.name,
-                '\nНомер: ', response.data.phoneNumber);
-        }, function (error) {
-            console.log(error, '\nя пока не могу этого сделать');
-        });
-    };
-
-    //******=========Update subscriber=========******
-    $scope.updateSubscriber = function () {
-        $http({
-            method: 'PUT',
-            url: '/api/subscribers/' + parseInt($scope.subscriberModel.id),
-            data: $scope.subscriberModel
-        }).then(function (response) {
-            console.log(response, '\nВ БД обновлены данные, полученные из модального' +
-                ' окна\nДанные: ', response.data, '\nИмя: ', response.data.name, '\nНомер: ', response.data.phoneNumber);
-            $scope.reset();
-            getallData();
-        }, function (error) {
-            console.log(error);
-        });
-    };
-
     //******=========Delete subscriber=========******
     $scope.deleteSubscriber = function (subscriber) {
         var IsConf = confirm('Удалить запись с именем ' + subscriber.name + '?');
@@ -99,21 +55,13 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$log', functio
                 method: 'DELETE',
                 url: '/api/subscribers/' + parseInt(subscriber.id)
             }).then(function (response) {
-                //$scope.reset();
                 getallData();
             }, function (error) {
                 console.log(error);
             });
         }
     };
-
-    //******=========Clear Form=========******
-    $scope.reset = function () {
-        var msg = "Form Cleared";
-        $scope.subscriberModel = {};
-        $scope.subscriberModel.id = 0;
-    };
-
+ 
     /* Filters */ 
     {
         $scope.sortField = undefined;
@@ -141,7 +89,7 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$log', functio
 phonebookApp.controller('ModalCtrl', ['$scope', '$http', '$uibModal', '$log', '$document', function ($scope, $http, $uibModal, $log, $document) {
     var mdctrl = this;
 
-    mdctrl.defaultModel = { name: "Оля", phoneNumber: 89221234567, id: 0 };
+    mdctrl.defaultModel = { name: "", phoneNumber: "", id: 0 };
         
     mdctrl.animationsEnabled = true;
     mdctrl.toggleAnimation = function () {
@@ -242,8 +190,7 @@ phonebookApp.controller('ModalCtrl', ['$scope', '$http', '$uibModal', '$log', '$
     };
 }]);
 
-// Please note that $uibModalInstance represents a modal window (instance) dependency.
-// It is not the same as the $uibModal service used above.
+/* Modal instance controller */
 
 phonebookApp.controller('ModalInstanceCtrl', ['$uibModalInstance', 'subscriberModel',
     function ($uibModalInstance, subscriberModel) {
