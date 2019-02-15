@@ -2,7 +2,7 @@
 
 /* Controllers */
 var phonebookApp = angular.module('phonebookApp', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
-phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$uibModal', '$log', '$document', function ($scope, $http, $uibModal, $log, $document) {
+phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$log', function ($scope, $http, $log) {
 
     $scope.title = "Абоненты";
     $scope.subscriberList = null;
@@ -14,6 +14,27 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$uibModal', '$
     $scope.setSubscriberList = function (subscriberList) {
         $scope.subscriberList = subscriberList;
     };
+
+    //Pagination
+    {
+        $scope.viewby = 10;
+        $scope.itemsPerPage = $scope.viewby;
+        $scope.currentPage = 1;
+        $scope.maxSize = 3;
+
+        $scope.setPage = function (pageNo) {
+            $scope.currentPage = pageNo;
+        };
+
+        $scope.setItemsPerPage = function (num) {
+            $scope.itemsPerPage = num;
+            $scope.currentPage = 1; 
+        }
+
+        $scope.pageChanged = function () {
+            $log.log('Page changed to: ' + $scope.currentPage);
+        };
+    }
 
     //******=========Get subscribers=========******
     function getallData() {
@@ -39,20 +60,6 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$uibModal', '$
         });
     };
 
-    //******=========Save subscriber=========******
-    //$scope.saveSubscriberViaModal = function () {
-    //    //$scope.modctrl.open();
-    //    //getallData();
-    //};
-
-    //$scope.saveSubscriberAfterModal = function () {
-    //    $scope.modctrl.open();
-    //    $scope.subscriberModel = $scope.subscriberToSave;
-    //    //$scope.subscriberModel = { name: "Имя", phoneNumber: 89239876543, id: 0 };//$scope.subscriberToSave; //
-    //    //$scope.subscriberModel.id = 0;
-    //    //$scope.saveSubscriber($scope.subscriberModel);
-    //};
-
     $scope.saveSubscriber = function () {
         $http({
             method: 'POST',
@@ -61,7 +68,8 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$uibModal', '$
         }).then(function (response) {
             $scope.reset();
             getallData();
-            console.log(response, '\nпосле getalldata()\nИмя: ', response.data.name, '\nНомер: ', response.data.phoneNumber);
+            console.log(response, '\nпосле getalldata()\nИмя: ', response.data.name,
+                '\nНомер: ', response.data.phoneNumber);
         }, function (error) {
             console.log(error, '\nя пока не могу этого сделать');
         });
@@ -74,6 +82,8 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$uibModal', '$
             url: '/api/subscribers/' + parseInt($scope.subscriberModel.id),
             data: $scope.subscriberModel
         }).then(function (response) {
+            console.log(response, '\nВ БД обновлены данные, полученные из модального' +
+                ' окна\nДанные: ', response.data, '\nИмя: ', response.data.name, '\nНомер: ', response.data.phoneNumber);
             $scope.reset();
             getallData();
         }, function (error) {
@@ -131,63 +141,105 @@ phonebookApp.controller('PhonebookListCtrl', ['$scope', '$http', '$uibModal', '$
 phonebookApp.controller('ModalCtrl', ['$scope', '$http', '$uibModal', '$log', '$document', function ($scope, $http, $uibModal, $log, $document) {
     var mdctrl = this;
 
-        mdctrl.subscriberModel = {};
-        mdctrl.subscriberModel.name = "Оля";
-        mdctrl.subscriberModel.phoneNumber = 89221234567;
-        mdctrl.subscriberModel.id = 0;
-        //mdctrl.subscriberList = null;
-        //$ctrl.subscriberModel = subscriberModel;
+    mdctrl.defaultModel = { name: "Оля", phoneNumber: 89221234567, id: 0 };
         
-        mdctrl.animationsEnabled = true;
+    mdctrl.animationsEnabled = true;
+    mdctrl.toggleAnimation = function () {
+        mdctrl.animationsEnabled = !mdctrl.animationsEnabled;
+    };
 
-        //mdctrl.open = function (size, parentSelector) {
-        $scope.open = function (size, parentSelector) {
-            var parentElem = parentSelector ?
-                angular.element($document[0].querySelector('.modal-my ' + parentSelector)) : undefined;
-            var modalInstance = $uibModal.open({
-                animation: mdctrl.animationsEnabled,
-                ariaLabelledBy: 'modal-title',
-                ariaDescribedBy: 'modal-body',
-                templateUrl: 'modal.html',
-                controller: 'ModalInstanceCtrl',
-                controllerAs: 'mdlictrl',
-                size: size,
-                appendTo: parentElem,
-                resolve: {
-                    subscriberModel: function () {
-                        return mdctrl.subscriberModel;
-                    }
+    $scope.open = function (size, parentSelector) {
+        var parentElem = parentSelector ?
+            angular.element($document[0].querySelector('.modal-my ' + parentSelector)) : undefined;
+        var modalInstance = $uibModal.open({
+            animation: mdctrl.animationsEnabled,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'modal.html',
+            controller: 'ModalInstanceCtrl',
+            controllerAs: 'mdlictrl',
+            size: size,
+            scope: $scope,
+            appendTo: parentElem,
+            resolve: {
+                subscriberModel: function () {
+                    return mdctrl.defaultModel;
                 }
-            });
+            }
+        });
 
-            modalInstance.result.then(function (subscriber) {
+        modalInstance.result.then(function (subscriber) {
+            $http({
+                method: 'POST',
+                url: '/api/subscribers/',
+                data: subscriber
+            }).then(function (response) {
+                console.log(response, '\nВ БД добавлены данные, полученные из модального' +
+                    ' окна\nИмя: ', response.data.name, '\nНомер: ', response.data.phoneNumber);
                 $http({
-                    method: 'POST',
-                    url: '/api/subscribers/',
-                    data: subscriber
+                    method: 'GET',
+                    url: 'api/subscribers'
                 }).then(function (response) {
-                    console.log(response, '\nВ БД добавлены данные, полученные из модального окна\nИмя: ', response.data.name, '\nНомер: ', response.data.phoneNumber);
-                    $http({
-                        method: 'GET',
-                        url: 'api/subscribers'
-                    }).then(function (response) {
-                        $scope.setSubscriberList(response.data);
-                        console.log('\ngetalldata() выполнена\nДанные: ', response.data);
-                    }, function (error) {
-                        console.log(error, 'can not get data.');
-                    });
+                    $scope.setSubscriberList(response.data);
+                    console.log('\ngetalldata() выполнена\nДанные: ', response.data);
                 }, function (error) {
-                    console.log(error, '\nОшибка при добавлении данных, полученных из модального окна, в БД');
+                    console.log(error, 'can not get data.');
                 });
-                $log.info('Данные успешно добавлены в: ' + new Date());
-            }, function () {
-                $log.info('Modal dismissed at: ' + new Date());
+            }, function (error) {
+                console.log(error, '\nОшибка при добавлении данных, полученных ' +
+                    'из модального окна, в БД');
             });
-        };
+            $log.info('Данные успешно добавлены в: ' + new Date());
+        }, function () {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
 
-        mdctrl.toggleAnimation = function () {
-            mdctrl.animationsEnabled = !mdctrl.animationsEnabled;
-        };
+    $scope.update_open = function (size, parentSelector) {
+        var parentElem = parentSelector ?
+            angular.element($document[0].querySelector('.modal-my ' + parentSelector)) : undefined;
+        var modalInstance = $uibModal.open({
+            animation: mdctrl.animationsEnabled,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'modal.html',
+            controller: 'ModalInstanceCtrl',
+            controllerAs: 'mdlictrl',
+            size: size,
+            scope: $scope,
+            appendTo: parentElem,
+            resolve: {
+                subscriberModel: function () {
+                    return $scope.item;
+                }
+            }
+        });
+
+        modalInstance.result.then(function (subscriber) {
+            $http({
+                method: 'PUT',
+                url: '/api/subscribers/' + parseInt(subscriber.id),
+                data: subscriber
+            }).then(function (response) {
+                console.log('\nВ БД обновлены данные, полученные из модального окна');
+                $http({
+                    method: 'GET',
+                    url: 'api/subscribers'
+                }).then(function (response) {
+                    $scope.setSubscriberList(response.data);
+                    console.log('getalldata() выполнена\nДанные: ', response.data);
+                }, function (error) {
+                    console.log(error, 'can not get data.');
+                });
+            }, function (error) {
+                console.log(error, '\nОшибка при обновлении данных, полученных ' +
+                    'из модального окна, в БД');
+            });
+            $log.info('Данные успешно обновлены в: ' + new Date());
+        }, function () {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
 }]);
 
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
@@ -195,19 +247,27 @@ phonebookApp.controller('ModalCtrl', ['$scope', '$http', '$uibModal', '$log', '$
 
 phonebookApp.controller('ModalInstanceCtrl', ['$uibModalInstance', 'subscriberModel',
     function ($uibModalInstance, subscriberModel) {
-    var mdictrl = this;
-    mdictrl.subscriber = subscriberModel;
+        var mdictrl = this;
+        mdictrl.subscriber = {
+            name: subscriberModel.name,
+            phoneNumber: subscriberModel.phoneNumber,
+            id: subscriberModel.id
+        };
+        mdictrl.windowTitle = subscriberModel.id == 0 ? "Добавление новой записи" : "Изменение записи";
+        
+        mdictrl.reset = function () {
+            mdictrl.subscriber = {
+                name: subscriberModel.name,
+                phoneNumber: subscriberModel.phoneNumber,
+                id: subscriberModel.id
+            };
+        };
 
-    //    mdictrl.reset = function () {
-    //        mdictrl.subscriber = {};
-    //        mdictrl.subscriber.id = 0;        
-    //};
+        mdictrl.ok = function () {
+            $uibModalInstance.close(mdictrl.subscriber);
+        };
 
-    mdictrl.ok = function () {
-        $uibModalInstance.close(mdictrl.subscriber);
-    };
-
-    mdictrl.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
+        mdictrl.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+        };
 }]); 
